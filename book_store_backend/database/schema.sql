@@ -1,0 +1,103 @@
+CREATE DATABASE IF NOT EXISTS bookstore;
+USE bookstore;
+
+CREATE TABLE IF NOT EXISTS admin_users (
+  admin_id INT AUTO_INCREMENT PRIMARY KEY,
+  admin_name VARCHAR(100) NOT NULL,
+  admin_email VARCHAR(150) NOT NULL UNIQUE,
+  admin_password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  last_login_at TIMESTAMP NULL
+);
+
+CREATE TABLE IF NOT EXISTS book_inventory (
+  book_id INT AUTO_INCREMENT PRIMARY KEY,
+  book_photo VARCHAR(255),
+  book_name VARCHAR(200) NOT NULL,
+  book_category VARCHAR(100) NOT NULL,
+  book_description TEXT,
+  author_name VARCHAR(150) NOT NULL,
+  author_description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0,
+  final_selling_price DECIMAL(10,2) NOT NULL,
+  stock_status VARCHAR(20) NOT NULL,
+  stock_amount INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS customer_users (
+  customer_id INT AUTO_INCREMENT PRIMARY KEY,
+  full_name VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  phone_number VARCHAR(30),
+  profile_photo VARCHAR(255),
+  address TEXT,
+  last_login_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS cart (
+  cart_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  items JSON NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_users(customer_id)
+);
+
+CREATE TABLE IF NOT EXISTS business_charges (
+  charges_id INT AUTO_INCREMENT PRIMARY KEY,
+  platform_fee DECIMAL(10,2) NOT NULL,
+  delivery_fee DECIMAL(10,2) NOT NULL,
+  taxes_percent DECIMAL(5,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  order_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  items_ordered JSON NOT NULL,
+  total_bill_amount DECIMAL(10,2) NOT NULL,
+  tax_charges DECIMAL(10,2) NOT NULL,
+  platform_fee DECIMAL(10,2) NOT NULL,
+  delivery_fee DECIMAL(10,2) NOT NULL,
+  order_status VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customer_users(customer_id)
+);
+
+CREATE TABLE IF NOT EXISTS about_us (
+  about_id INT AUTO_INCREMENT PRIMARY KEY,
+  company_name VARCHAR(200) NOT NULL,
+  company_tagline VARCHAR(255),
+  company_description TEXT,
+  director_message TEXT,
+  director_name VARCHAR(150),
+  mission TEXT,
+  vision TEXT,
+  partners JSON,
+  phone_no VARCHAR(30),
+  email_id VARCHAR(150),
+  address TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS contact_messages (
+  message_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  phone_no VARCHAR(30),
+  subject VARCHAR(255),
+  message TEXT NOT NULL,
+  status VARCHAR(30) NOT NULL DEFAULT 'NEW',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

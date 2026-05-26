@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+  <display-name>Online Bookstore</display-name>
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.auth.LoginServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>AdminLoginServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.auth.AdminLoginServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>RegisterServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.auth.RegisterServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.auth.LogoutServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>BookServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.user.BookServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>CartServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.user.CartServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>OrderServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.user.OrderServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ContactMessageServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.user.ContactMessageServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>AdminCustomerServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.admin.AdminCustomerServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>AdminUserServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.admin.AdminUserServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>BusinessChargesServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.admin.BusinessChargesServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>AboutUsServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.admin.AboutUsServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/auth/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminLoginServlet</servlet-name>
+    <url-pattern>/auth/admin-login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RegisterServlet</servlet-name>
+    <url-pattern>/auth/register</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/auth/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>BookServlet</servlet-name>
+    <url-pattern>/api/books/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CartServlet</servlet-name>
+    <url-pattern>/api/carts/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OrderServlet</servlet-name>
+    <url-pattern>/api/orders/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ContactMessageServlet</servlet-name>
+    <url-pattern>/api/contacts/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>AdminCustomerServlet</servlet-name>
+    <url-pattern>/api/customers/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminUserServlet</servlet-name>
+    <url-pattern>/api/admins/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>BusinessChargesServlet</servlet-name>
+    <url-pattern>/api/charges/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AboutUsServlet</servlet-name>
+    <url-pattern>/api/about/*</url-pattern>
+  </servlet-mapping>
+
+  <filter>
+    <filter-name>AuthFilter</filter-name>
+    <filter-class>com.bookstore.filter.AuthFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>AdminFilter</filter-name>
+    <filter-class>com.bookstore.filter.AdminFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>AuthFilter</filter-name>
+    <url-pattern>/api/carts/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AuthFilter</filter-name>
+    <url-pattern>/api/orders/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/admins/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/customers/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/charges/*</url-pattern>
+  </filter-mapping>
+
+  <listener>
+    <listener-class>com.bookstore.listener.AppContextListener</listener-class>
+  </listener>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/views/error/404.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/views/error/error.jsp</location>
+  </error-page>
+</web-app>
