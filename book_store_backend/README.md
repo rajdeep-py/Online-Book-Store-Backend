@@ -1,204 +1,305 @@
-# Online Bookstore Backend
+# 📚 Online Bookstore Backend
 
-A production-ready Java 17 backend using Jakarta Servlets, JDBC (MySQL), Maven, and Tomcat 11. It provides robust REST APIs for a complete online bookstore application including admin management, user catalogs, shopping carts, business fee configuration, order processing, and dynamic calculations.
-
----
-
-## 🏛️ Database Architecture & Schema
-
-The backend uses a MySQL 8 database (`bookstore`) with 8 highly structured tables:
-
-1. **Admin Users (`admin_users`)**
-   - `admin_id` (INT, Primary Key, Auto-increment)
-   - `admin_name` (VARCHAR)
-   - `admin_email` (VARCHAR, Unique)
-   - `admin_password` (VARCHAR, Hashed)
-   - `created_at` / `updated_at` (TIMESTAMP)
-   - `last_login_at` (TIMESTAMP)
-
-2. **Book Inventory (`book_inventory`)**
-   - `book_id` (INT, Primary Key, Auto-increment)
-   - `book_photo` (VARCHAR - file path)
-   - `book_name` (VARCHAR)
-   - `book_category` (VARCHAR)
-   - `book_description` (TEXT)
-   - `author_name` (VARCHAR)
-   - `author_description` (TEXT)
-   - `price` (DECIMAL)
-   - `discount_percent` (DECIMAL)
-   - `final_selling_price` (DECIMAL - autocalculated)
-   - `stock_status` (VARCHAR - `IN_STOCK`/`OUT_OF_STOCK`)
-   - `stock_amount` (INT)
-   - `created_at` / `updated_at` (TIMESTAMP)
-
-3. **Customer Users (`customer_users`)**
-   - `customer_id` (INT, Primary Key, Auto-increment)
-   - `full_name` (VARCHAR)
-   - `email` (VARCHAR, Unique)
-   - `password` (VARCHAR, Hashed)
-   - `phone_number` (VARCHAR)
-   - `profile_photo` (VARCHAR - file path)
-   - `address` (TEXT)
-   - `last_login_at` (TIMESTAMP)
-   - `created_at` / `updated_at` (TIMESTAMP)
-
-4. **Cart (`cart`)**
-   - `cart_id` (INT, Primary Key, Auto-increment)
-   - `customer_id` (INT, Foreign Key)
-   - `items` (JSON array of cart items: `book_id`, `book_name`, `author_name`, `price`, `discount_percent`, `final_selling_price`, `quantity`)
-   - `created_at` / `updated_at` (TIMESTAMP)
-
-5. **Business Charges (`business_charges`)**
-   - `charges_id` (INT, Primary Key, Auto-increment)
-   - `platform_fee` (DECIMAL)
-   - `delivery_fee` (DECIMAL)
-   - `taxes_percent` (DECIMAL)
-   - `created_at` / `updated_at` (TIMESTAMP)
-
-6. **Orders (`orders`)**
-   - `order_id` (INT, Primary Key, Auto-increment)
-   - `customer_id` (INT, Foreign Key)
-   - `items_ordered` (JSON array of ordered books with snapshots of prices)
-   - `total_bill_amount` (DECIMAL - calculated)
-   - `tax_charges` (DECIMAL - calculated)
-   - `platform_fee` (DECIMAL - fetched from business charges)
-   - `delivery_fee` (DECIMAL - fetched from business charges)
-   - `order_status` (VARCHAR - e.g., `PLACED`, `SHIPPED`, `DELIVERED`, `CANCELLED`)
-   - `created_at` / `updated_at` (TIMESTAMP)
-
-7. **About Us (`about_us`)**
-   - `about_id` (INT, Primary Key, Auto-increment)
-   - `company_name` (VARCHAR)
-   - `company_tagline` (VARCHAR)
-   - `company_description` (TEXT)
-   - `director_name` (VARCHAR)
-   - `director_message` (TEXT)
-   - `mission` (TEXT)
-   - `vision` (TEXT)
-   - `partners` (JSON array of objects with `partner_id`, `partner_name`, `partner_logo`)
-   - `phone_no` (VARCHAR)
-   - `email_id` (VARCHAR)
-   - `address` (TEXT)
-   - `created_at` / `updated_at` (TIMESTAMP)
-
-8. **Contact Messages (`contact_messages`)**
-   - `message_id` (INT, Primary Key, Auto-increment)
-   - `name` (VARCHAR)
-   - `email` (VARCHAR)
-   - `phone_no` (VARCHAR)
-   - `subject` (VARCHAR)
-   - `message` (TEXT)
-   - `status` (VARCHAR - e.g., `NEW`, `READ`, `RESOLVED`)
-   - `created_at` / `updated_at` (TIMESTAMP)
+A enterprise-grade Java 17 backend built using **Jakarta Servlets 6.0**, **JDBC**, **MySQL 8.0**, **Maven**, and designed to deploy on an **Apache Tomcat 11** application server. This project implements high-performance REST APIs for user catalogs, customer shopping carts, administration modules, dynamic platform charge rates, order processing, and fully automated inventory updates.
 
 ---
 
-## ⚡ Key Feature Highlights
+## 📂 Project Structure & Architecture
 
-### 1. Dynamic Pricing Calculations
-When a book is inserted or updated via `/api/books`, the API automatically calculates the **`final_selling_price`** on the server:
-$$\text{final\_selling\_price} = \text{price} \times \left(1 - \frac{\text{discount\_percent}}{100}\right)$$
-The server also checks `stock_amount` and automatically assigns the `stock_status` as `IN_STOCK` (if $> 0$) or `OUT_OF_STOCK` (if $\le 0$).
-
-### 2. Automatic Inventory Stock Updates
-When an order is successfully placed via `POST /api/orders`:
-- The API retrieves the current stock amount for each ordered book.
-- Decrements the book's stock by the ordered quantity (capping at a minimum of `0`).
-- Dynamically updates the `stock_status` to `OUT_OF_STOCK` if the new stock becomes `0`.
-
-### 3. Business Charges & Total Bill Calculations
-The order calculation is completely server-driven:
-- The API reads current active rates for `platform_fee`, `delivery_fee`, and `taxes_percent` from the `business_charges` table.
-- Subtotal is computed as:
-  $$\text{subtotal} = \sum (\text{final\_selling\_price} \times \text{quantity})$$
-- Taxes are dynamically calculated:
-  $$\text{tax\_charges} = \frac{\text{subtotal} \times \text{taxes\_percent}}{100}$$
-- The grand total bill is generated securely on the server side:
-  $$\text{total\_bill\_amount} = \text{subtotal} + \text{tax\_charges} + \text{platform\_fee} + \text{delivery\_fee}$$
-
-### 4. Structured File Uploads
-Files are stored securely in physical directories under context:
-* **Book Covers**: `/uploads/book/{book_id}/{sanitized_book_name}.{ext}`
-* **Customer Profile Pictures**: `/uploads/customers/{customer_id}/{sanitized_customer_name}.{ext}`
+```
+book_store_backend/
+├── .github/                   # CI/CD Workflows
+├── database/                  # SQL Database Scripts
+│   ├── schema.sql             # Creates tables, keys, and indexes automatically
+│   ├── sample-data.sql        # Seeds the database with testing data (admin, books, charges)
+│   └── triggers.sql           # Database triggers
+├── logs/                      # Project runtime logging output directory
+├── pom.xml                    # Maven configuration containing all dependencies (Jakarta Servlet, Parsson, MySQL)
+├── README.md                  # Comprehensive Documentation
+├── uploads/                   # Local file storage root for uploaded media
+│   ├── book/                  # Dynamic book cover photos: /uploads/book/{id}/{name}.{ext}
+│   └── customers/             # Dynamic customer avatars: /uploads/customers/{id}/{name}.{ext}
+└── src/
+    └── main/
+        ├── java/              # Clean Architecture Source Directory
+        │   └── com/
+        │       └── bookstore/
+        │           ├── controller/           # REST Endpoints / Servlets
+        │           │   ├── admin/            # Administrative APIs
+        │           │   │   ├── AboutUsServlet.java
+        │           │   │   ├── AdminAnalyticsServlet.java
+        │           │   │   ├── AdminBookServlet.java
+        │           │   │   ├── AdminCustomerServlet.java
+        │           │   │   ├── AdminDashboardServlet.java
+        │           │   │   ├── AdminOrderServlet.java
+        │           │   │   ├── AdminUserServlet.java
+        │           │   │   └── BusinessChargesServlet.java
+        │           │   ├── auth/             # Session Authentication APIs
+        │           │   │   ├── AdminLoginServlet.java
+        │           │   │   ├── LoginServlet.java
+        │           │   │   ├── LogoutServlet.java
+        │           │   │   └── RegisterServlet.java
+        │           │   └── user/             # Customer Public Catalog & Transaction APIs
+        │           │       ├── BookServlet.java
+        │           │       ├── CartServlet.java
+        │           │       ├── CheckoutServlet.java
+        │           │       ├── ContactMessageServlet.java
+        │           │       ├── OrderServlet.java
+        │           │       └── SearchServlet.java
+        │           ├── dao/                  # Data Access Objects (Raw SQL/JDBC Queries)
+        │           │   ├── AboutUsDAO.java
+        │           │   ├── AdminDAO.java
+        │           │   ├── AnalyticsDAO.java
+        │           │   ├── BookDAO.java
+        │           │   ├── BusinessChargesDAO.java
+        │           │   ├── CartDAO.java
+        │           │   ├── CategoryDAO.java
+        │           │   ├── ContactMessageDAO.java
+        │           │   ├── OrderDAO.java
+        │           │   └── UserDAO.java
+        │           ├── filter/               # Security Middleware Filters
+        │           │   ├── AdminFilter.java  # Admin session check
+        │           │   └── AuthFilter.java   # Customer session check
+        │           ├── listener/             # Servlet Lifecycle Listeners
+        │           │   └── AppContextListener.java
+        │           ├── model/                # Data Entities / POJOs
+        │           │   ├── AboutUs.java
+        │           │   ├── AdminUser.java
+        │           │   ├── Analytics.java
+        │           │   ├── Book.java
+        │           │   ├── BusinessCharges.java
+        │           │   ├── Cart.java
+        │           │   ├── CartItem.java
+        │           │   ├── Category.java
+        │           │   ├── ContactMessage.java
+        │           │   ├── Order.java
+        │           │   ├── OrderItem.java
+        │           │   └── User.java
+        │           ├── service/              # Core Domain Business Logic Layers
+        │           │   ├── AnalyticsService.java
+        │           │   ├── AuthService.java  # Authentication helper
+        │           │   ├── BookService.java   # Dynamic pricing & stock status calculations
+        │           │   ├── CartService.java
+        │           │   └── OrderService.java  # Auto-stock decrements & tax/bill calculations
+        │           └── util/                 # Technical Helper Utilities
+        │               ├── DBConnection.java       # Thread-safe database pooling pool
+        │               ├── FileStorageUtil.java    # Photo path generation & writing
+        │               ├── JsonUtil.java           # Stream JSON parser helper
+        │               ├── PasswordUtil.java       # Salted PBKDF2 password hashing
+        │               ├── ResponseUtil.java       # Unified API payload writes
+        │               ├── SQLScriptRunner.java    # Automatically parses & runs SQL files
+        │               └── SessionUtil.java        # Session attribute helpers
+        └── resources/         # Configuration Decoupling Files
+            ├── db.properties               # MySQL database connection configurations
+            └── queries.properties          # Decoupled SQL queries to avoid inline java statements
+```
 
 ---
 
-## 🚀 API Endpoints
+## 💻 Running the Backend Server on macOS
 
-### 🔐 Authentication Routes
-* `POST /auth/login` - Customer login (expects JSON: `{"email": "...", "password": "..."}`)
-* `POST /auth/admin-login` - Admin login (expects JSON: `{"email": "...", "password": "..."}`)
-* `POST /auth/register` - Customer registration
-* `GET /auth/logout` - Clear login sessions
+### 🛠️ 1. Prerequisites Setup
+Install Java 17, Maven, MySQL, and Tomcat 11 using Homebrew:
+```bash
+# 1. Install Java Development Kit 17
+brew install openjdk@17
 
-### 📚 Book Catalog APIs (`/api/books/*`)
-* `GET /api/books` - Retrieve all books (or search via `?q=keyword`)
-* `GET /api/books/{id}` - Retrieve details of a specific book
-* `POST /api/books` - Insert a book (handles JSON or multipart/form-data with photo)
-* `PUT /api/books/{id}` - Update all fields of a book
-* `DELETE /api/books/{id}` - Delete a book
+# 2. Install Maven (Java Project Builder)
+brew install maven
 
-### 🛒 Cart APIs (`/api/carts/*`)
-* `GET /api/carts` - Retrieve cart details (uses session or query param `?customer_id=`)
-* `POST /api/carts` - Create cart or add items (JSON payload)
-* `PUT /api/carts/{id}` - Replace entire cart items list
-* `DELETE /api/carts/{id}` - Clear cart
+# 3. Install MySQL Server & Tomcat 11
+brew install mysql tomcat
+```
 
-### 📦 Order APIs (`/api/orders/*`)
-* `GET /api/orders` - List all orders (filtered by customer session or retrieved as admin)
-* `GET /api/orders/{id}` - Get order summary and pricing snapshot
-* `POST /api/orders` - Place order (requires JSON: `{"items": [{"book_id": 1, "quantity": 2}, ...]}`)
-* `PUT /api/orders/{id}` - Update order status (Admin operation)
-* `DELETE /api/orders/{id}` - Cancel/Delete order
+### 🗄️ 2. MySQL Setup & Initialization
+Start the MySQL services and execute the database configuration:
+```bash
+# 1. Start the MySQL Background Service
+brew services start mysql
 
-### 👥 Customer Management (`/api/customers/*`) (Admin only)
-* `GET /api/customers` - List all registered customers
-* `GET /api/customers/{id}` - View customer profile details
-* `POST /api/customers` - Create customer user
-* `PUT /api/customers/{id}` - Update all profile details (handles multipart/form-data for profile picture)
-* `DELETE /api/customers/{id}` - Remove customer
+# 2. Connect to MySQL without a password initially
+mysql -u root
 
-### 🛡️ Administrator User Management (`/api/admins/*`) (Admin only)
-* `GET /api/admins` - List all administrators
-* `GET /api/admins/{id}` - View specific administrator
-* `POST /api/admins` - Create admin user
-* `PUT /api/admins/{id}` - Edit admin details
-* `DELETE /api/admins/{id}` - Revoke admin users
+# 3. (Inside MySQL Prompt) Setup database, users, and credentials:
+mysql> CREATE DATABASE bookstore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+mysql> CREATE USER 'bookstore_user'@'localhost' IDENTIFIED BY 'Bookstore@Secure2026!';
+mysql> GRANT ALL PRIVILEGES ON bookstore.* TO 'bookstore_user'@'localhost';
+mysql> FLUSH PRIVILEGES;
+mysql> exit
+```
 
-### ⚙️ Business Charges Config (`/api/charges/*`)
-* `GET /api/charges` - View list of configurations
-* `GET /api/charges/{id}` - Retrieve fee details
-* `POST /api/charges` - Create fee rules
-* `PUT /api/charges/{id}` - Modify platform, tax, or delivery percentages
-* `DELETE /api/charges/{id}` - Reset configurations
+Run the schema and initial seed data:
+```bash
+# 1. Initialize tables and constraints
+mysql -u bookstore_user -p'Bookstore@Secure2026!' < database/schema.sql
 
-### 📄 About Us & Contacts (`/api/about/*` & `/api/contacts/*`)
-* `GET | POST | PUT | DELETE /api/about/*` - Manage company profile and info
-* `GET | POST | PUT | DELETE /api/contacts/*` - Post public queries or retrieve inquiries (Admin only)
+# 2. Seed database with initial Admin login (admin@bookstore.com / admin123) and sample books
+mysql -u bookstore_user -p'Bookstore@Secure2026!' < database/sample-data.sql
+```
 
----
+### 💻 3. Configure and Package Project
+Configure the database credentials inside `/src/main/resources/db.properties`:
+```properties
+db.url=jdbc:mysql://localhost:3306/bookstore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+db.user=bookstore_user
+db.password=Bookstore@Secure2026!
+db.pool.size=10
+```
 
-## 🛠️ Build and Setup instructions
-
-### Requirements
-- **Java 17 JDK**
-- **Maven 3.9+**
-- **MySQL 8.0+**
-- **Apache Tomcat 11**
-
-### Local Database Configuration
-1. Initialize the database by creating `bookstore` in MySQL.
-2. Edit database access properties under `src/main/resources/db.properties`:
-   ```properties
-   db.url=jdbc:mysql://localhost:3306/bookstore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-   db.user=your_username
-   db.password=your_password
-   ```
-
-### Compile & Build WAR
-To build the WAR artifact, compile the Java source code and bundle resources:
+Build the enterprise WAR archive:
 ```bash
 mvn clean package
 ```
-Deploy the generated `target/book_store_backend.war` by placing it in your Tomcat 11 `webapps/` folder.
-On server startup, the `AppContextListener` will automatically execute `database/schema.sql` to setup tables, constraints, and indexes.
+
+### 🚀 4. Run on Tomcat Server
+Deploy the packaged WAR directly to the local Homebrew Tomcat directory:
+```bash
+# 1. Start Tomcat Server
+brew services start tomcat
+
+# 2. Deploy your war file (copies it to Tomcat webapps directory)
+cp target/book_store_backend.war /opt/homebrew/Cellar/tomcat/11.0.22/libexec/webapps/
+
+# 3. Tomcat will automatically extract the archive. Test your server:
+curl -s http://localhost:8080/book_store_backend/api/books
+```
+
+---
+
+## 🪟 Running the Backend Server on Windows
+
+### 🛠️ 1. Prerequisites Setup
+1. **Download JDK 17**: Download and install [Eclipse Temurin JDK 17 (LTS)](https://adoptium.net/temurin/releases/?version=17).
+2. **Download Maven**: Download [Apache Maven](https://maven.apache.org/download.cgi) zip, extract it to `C:\Program Files\maven`, and add `C:\Program Files\maven\bin` to your system environment `PATH` variable.
+3. **Download MySQL**: Install [MySQL Community Server](https://dev.mysql.com/downloads/installer/) via the Windows Installer.
+4. **Download Tomcat 11**: Download the "Core 64-bit Windows zip" from the [Apache Tomcat 11 Page](https://tomcat.apache.org/download-11.cgi) and extract it to `C:\tomcat11`.
+
+### 🗄️ 2. MySQL Setup (Windows Command Prompt)
+Open your Command Prompt (CMD) as **Administrator**:
+```cmd
+:: 1. Navigate to MySQL installation bin folder
+cd "C:\Program Files\MySQL\MySQL Server 8.0\bin"
+
+:: 2. Connect to MySQL Server (type your root password set during installation)
+mysql -u root -p
+
+:: 3. Run queries inside the prompt:
+mysql> CREATE DATABASE bookstore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+mysql> CREATE USER 'bookstore_user'@'localhost' IDENTIFIED BY 'Bookstore@Secure2026!';
+mysql> GRANT ALL PRIVILEGES ON bookstore.* TO 'bookstore_user'@'localhost';
+mysql> FLUSH PRIVILEGES;
+mysql> exit
+```
+
+Run schema and data seeding scripts:
+```cmd
+:: Run these from your project directory (where database/ is located)
+mysql -u bookstore_user -p"Bookstore@Secure2026!" bookstore < database/schema.sql
+mysql -u bookstore_user -p"Bookstore@Secure2026!" bookstore < database/sample-data.sql
+```
+
+### 💻 3. Configure and Package Project
+Configure the database credentials inside `/src/main/resources/db.properties`:
+```properties
+db.url=jdbc:mysql://localhost:3306/bookstore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+db.user=bookstore_user
+db.password=Bookstore@Secure2026!
+```
+
+Build the WAR artifact inside your project root:
+```cmd
+mvn clean package
+```
+
+### 🚀 4. Run on Tomcat Server
+Deploy the packaged WAR into your Windows Tomcat folder:
+```cmd
+:: 1. Copy the WAR to Tomcat webapps directory
+copy target\book_store_backend.war C:\tomcat11\webapps\
+
+:: 2. Navigate to Tomcat bin directory and start the server
+cd C:\tomcat11\bin
+startup.bat
+```
+
+To stop the server at any point, run:
+```cmd
+shutdown.bat
+```
+
+---
+
+## 🛠️ Developing and Running in VS Code (Universal)
+
+Visual Studio Code provides a streamlined, fully integrated development experience for managing your Tomcat Server and MySQL databases directly.
+
+### 🔌 1. Recommended Extensions
+Open VS Code, click the **Extensions** icon (or press `Ctrl+Shift+X`/`Cmd+Shift+X`) and install:
+1. **Extension Pack for Java** (by Microsoft) — Provides full Java development support, code completions, and debugging.
+2. **Community Server Connector** (by Red Hat) — Integrates Apache Tomcat into VS Code's sidebar so you can start, stop, and deploy with single clicks.
+3. **Database Client** (by Weijan Chen) — An excellent visual MySQL client directly inside VS Code.
+
+### ⚙️ 2. Configure Tomcat in VS Code
+1. Once **Community Server Connector** is installed, navigate to the **Servers** tab in the VS Code sidebar.
+2. Click **Create New Server** -> Select **Apache Tomcat**.
+3. Choose the Tomcat installation directory:
+   * **macOS (Homebrew)**: `/opt/homebrew/Cellar/tomcat/11.0.22/libexec`
+   * **Windows**: `C:\tomcat11`
+4. Name the server `Tomcat 11`.
+5. Right-click the newly added server and click **Start Server**.
+
+### 📦 3. Build & Hot Deploy inside VS Code
+1. Open a terminal inside VS Code (`Ctrl+`` / `Cmd+``) and build:
+   ```bash
+   mvn clean package
+   ```
+2. In the **Servers** sidebar panel, right-click `Tomcat 11` and select **Add Deployment**.
+3. Browse and select the WAR file: `target/book_store_backend.war`.
+4. Tomcat will automatically deploy, and VS Code will hot-reload your classes whenever you make changes and rebuild!
+
+---
+
+## 🧪 Live API Examples (CURL)
+
+Use these examples to test, mock, or query the backend services.
+
+### 1. Public Books Catalog
+**Retrieve all books:**
+```bash
+curl -i -X GET http://localhost:8080/book_store_backend/api/books
+```
+
+**Search books by keyword:**
+```bash
+curl -i -X GET "http://localhost:8080/book_store_backend/api/books?q=Clean"
+```
+
+### 2. Admin Login
+**Authenticate administrative profile:**
+```bash
+curl -i -X POST http://localhost:8080/book_store_backend/auth/admin-login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@bookstore.com", "password": "admin123"}'
+```
+
+### 3. Customer Actions (Register, Login, & Checkout)
+**Register customer profile:**
+```bash
+curl -i -X POST http://localhost:8080/book_store_backend/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"full_name": "James Smith", "email": "james.smith@example.com", "password": "SecurePassword123!", "phone_number": "+1555123456", "address": "123 Main St, New York, NY"}'
+```
+
+**Customer Login:**
+```bash
+curl -i -X POST http://localhost:8080/book_store_backend/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "james.smith@example.com", "password": "SecurePassword123!"}'
+```
+
+**Place an Order (Calculates platforms charges, tax fees, totals, and updates book stock in real-time):**
+```bash
+curl -i -X POST http://localhost:8080/book_store_backend/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id": 1, "items": [{"book_id": 1, "quantity": 2}, {"book_id": 2, "quantity": 1}]}'
+```
