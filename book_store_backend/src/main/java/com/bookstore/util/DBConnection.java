@@ -30,6 +30,11 @@ public final class DBConnection {
         if (initialized) {
             return;
         }
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException("MySQL JDBC Driver not found", ex);
+        }
         url = props.getProperty("db.url");
         user = props.getProperty("db.user");
         password = props.getProperty("db.password");

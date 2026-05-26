@@ -19,7 +19,7 @@ public class AppContextListener implements ServletContextListener {
             } else {
                 DBConnection.initFromClasspath();
             }
-            SQLScriptRunner.runFromClasspath("database/schema.sql");
+            SQLScriptRunner.runFromClasspath("schema.sql");
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to initialize DBConnection", ex);
         }

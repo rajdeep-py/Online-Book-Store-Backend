@@ -1,7 +1,7 @@
 USE bookstore;
 
 INSERT INTO admin_users (admin_name, admin_email, admin_password) VALUES
-('Admin', 'admin@bookstore.com', 'REPLACE_WITH_HASHED_PASSWORD');
+('Admin', 'admin@bookstore.com', '2vedA3iJfBCkDT62cGN2zw==:daIBz1QR615VCEJfqz63dZZy3K08CMI9d5JHbzimnbo=');
 
 INSERT INTO business_charges (platform_fee, delivery_fee, taxes_percent) VALUES
 (20.00, 40.00, 5.00);
