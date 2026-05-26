@@ -117,6 +117,10 @@
   </servlet-mapping>
 
   <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>com.bookstore.filter.CorsFilter</filter-class>
+  </filter>
+  <filter>
     <filter-name>AuthFilter</filter-name>
     <filter-class>com.bookstore.filter.AuthFilter</filter-class>
   </filter>
@@ -125,6 +129,10 @@
     <filter-class>com.bookstore.filter.AdminFilter</filter-class>
   </filter>
 
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>AuthFilter</filter-name>
     <url-pattern>/api/carts/*</url-pattern>

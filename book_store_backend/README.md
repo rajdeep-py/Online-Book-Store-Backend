@@ -312,6 +312,12 @@ Open the **Extensions** panel inside VS Code (`Ctrl+Shift+X` / `Cmd+Shift+X`) an
 
 Use these examples to test, mock, or query the backend services.
 
+### 1. Admin SignUp Request
+**Create an Admin Account:**
+curl -i -X POST http://localhost:8080/book_store_backend/auth/admin-login -H "Content-Type: application/json" -d '{"email": "admin@bookstore.com", "password": "admin123"}'
+
+
+
 ### 1. Public Books Catalog
 **Retrieve all books:**
 ```bash
