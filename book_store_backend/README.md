@@ -151,7 +151,7 @@ Build the enterprise WAR archive:
 mvn clean package
 ```
 
-### 🚀 4. Run on Tomcat Server
+### 🚀 4. Run & Stop Tomcat Server
 Deploy the packaged WAR directly to the local Homebrew Tomcat directory:
 ```bash
 # 1. Start Tomcat Server
@@ -162,6 +162,11 @@ cp target/book_store_backend.war /opt/homebrew/Cellar/tomcat/11.0.22/libexec/web
 
 # 3. Tomcat will automatically extract the archive. Test your server:
 curl -s http://localhost:8080/book_store_backend/api/books
+```
+
+🛑 **To Stop the Tomcat server on macOS:**
+```bash
+brew services stop tomcat
 ```
 
 ---
@@ -211,7 +216,7 @@ Build the WAR artifact inside your project root:
 mvn clean package
 ```
 
-### 🚀 4. Run on Tomcat Server
+### 🚀 4. Run & Stop Tomcat Server
 Deploy the packaged WAR into your Windows Tomcat folder:
 ```cmd
 :: 1. Copy the WAR to Tomcat webapps directory
@@ -222,40 +227,84 @@ cd C:\tomcat11\bin
 startup.bat
 ```
 
-To stop the server at any point, run:
-```cmd
-shutdown.bat
-```
+🛑 **To Stop the Tomcat server on Windows:**
+* **Option A**: Simply close the separate command prompt window that opened when running `startup.bat`.
+* **Option B**: Run the shutdown script inside the Tomcat bin folder:
+  ```cmd
+  cd C:\tomcat11\bin
+  shutdown.bat
+  ```
 
 ---
 
-## 🛠️ Developing and Running in VS Code (Universal)
+## 🛠️ Developing & Running inside VS Code
 
-Visual Studio Code provides a streamlined, fully integrated development experience for managing your Tomcat Server and MySQL databases directly.
+> ⚠️ **IMPORTANT (CAUTION)**: Do **NOT** use VS Code's **"Remote - SSH"** extension to run or add Apache Tomcat! *Remote - SSH* is solely for connecting to external remote servers. Because Apache Tomcat and MySQL are running locally on your own computer, you must run it locally in standard workspace mode.
 
-### 🔌 1. Recommended Extensions
-Open VS Code, click the **Extensions** icon (or press `Ctrl+Shift+X`/`Cmd+Shift+X`) and install:
-1. **Extension Pack for Java** (by Microsoft) — Provides full Java development support, code completions, and debugging.
-2. **Community Server Connector** (by Red Hat) — Integrates Apache Tomcat into VS Code's sidebar so you can start, stop, and deploy with single clicks.
-3. **Database Client** (by Weijan Chen) — An excellent visual MySQL client directly inside VS Code.
+There are two primary methods to run and deploy the Bookstore project inside Visual Studio Code:
 
-### ⚙️ 2. Configure Tomcat in VS Code
-1. Once **Community Server Connector** is installed, navigate to the **Servers** tab in the VS Code sidebar.
-2. Click **Create New Server** -> Select **Apache Tomcat**.
-3. Choose the Tomcat installation directory:
-   * **macOS (Homebrew)**: `/opt/homebrew/Cellar/tomcat/11.0.22/libexec`
-   * **Windows**: `C:\tomcat11`
-4. Name the server `Tomcat 11`.
-5. Right-click the newly added server and click **Start Server**.
+### 💻 Method A: The Simplest Terminal Way (Highly Recommended)
+This is the easiest and most direct method. It uses VS Code's integrated terminal to package and hot-deploy your application directly to your active local Tomcat instance.
 
-### 📦 3. Build & Hot Deploy inside VS Code
-1. Open a terminal inside VS Code (`Ctrl+`` / `Cmd+``) and build:
+1. **Open the Project Folder**:
+   - Launch VS Code.
+   - Click **File ➡️ Open Folder...** and select `/Users/rajdeepdey/Project/Online Book Store/backend/book_store_backend` (or your local project root).
+2. **Open the Integrated Terminal**:
+   - Open a terminal inside VS Code by pressing ``Ctrl + ` `` or clicking **Terminal ➡️ New Terminal** in the top menu bar.
+3. **Build the Project WAR file**:
+   - Type this command inside the terminal and press **Enter** to compile and package your Java servlet code:
+     ```bash
+     mvn clean package
+     ```
+4. **Deploy the WAR file to Tomcat**:
+   * **macOS**:
+     ```bash
+     cp target/book_store_backend.war /opt/homebrew/Cellar/tomcat/11.0.22/libexec/webapps/
+     ```
+   * **Windows**:
+     ```cmd
+     copy target\book_store_backend.war C:\tomcat11\webapps\
+     ```
+5. **Verify and Play**:
+   Tomcat automatically extracts and starts the backend service. Open your browser and navigate to:  
+   🔗 **[http://localhost:8080/book_store_backend/api/books](http://localhost:8080/book_store_backend/api/books)**
+6. 🛑 **Stop Server**:
+   To shut down the background Tomcat server running on your machine:
+   * **macOS**: `brew services stop tomcat`
+   * **Windows**: Run `shutdown.bat` inside the Tomcat bin folder, or close the terminal window.
+
+---
+
+### ⚙️ Method B: The Visual Sidebar Control Way (Optional UI Tooling)
+This method integrates Apache Tomcat directly into your VS Code side panel, allowing you to visually start, stop, and hot-reload deployments with graphical buttons.
+
+#### 🔌 1. Install Extensions
+Open the **Extensions** panel inside VS Code (`Ctrl+Shift+X` / `Cmd+Shift+X`) and install:
+1. **Extension Pack for Java** (by Microsoft) — Essential for compiling and debugging Java.
+2. **Community Server Connector** (by Red Hat) — Integrates Apache Tomcat into your VS Code sidebar.
+3. **Database Client** (by Weijan Chen) — An awesome, visual SQL database manager inside VS Code.
+
+#### ⚙️ 2. Configure Tomcat Server in the Sidebar
+1. After installing **Community Server Connector**, you will see a new **"SERVERS"** panel at the bottom of your Explorer sidebar.
+2. Click the **`+`** (plus) icon on the **SERVERS** header.
+3. Select **"No, use custom server..."** in the top dropdown prompt.
+4. Select **Apache Tomcat** from the list.
+5. Provide the folder path to your local Tomcat:
+   * **macOS**: Select the folder `/opt/homebrew/Cellar/tomcat/11.0.22/libexec`
+   * **Windows**: Select the folder `C:\tomcat11`
+6. Click **Finish**. You will now see `Tomcat 11` listed in the panel.
+
+#### 🚀 3. Run, Stop, and Deploy
+1. Build the WAR archive in your terminal:
    ```bash
    mvn clean package
    ```
-2. In the **Servers** sidebar panel, right-click `Tomcat 11` and select **Add Deployment**.
-3. Browse and select the WAR file: `target/book_store_backend.war`.
-4. Tomcat will automatically deploy, and VS Code will hot-reload your classes whenever you make changes and rebuild!
+2. Under the **SERVERS** sidebar panel, **right-click** `Tomcat 11` and select **Start Server**.
+3. Once started, **right-click** `Tomcat 11` again, select **Add Deployment**, and pick your packaged WAR file:  
+   `target/book_store_backend.war`.
+4. Any time you update your Java code, rebuild with `mvn clean package`, and VS Code will dynamically reload your live endpoints!
+5. 🛑 **Stop Server**:
+   Under the **SERVERS** sidebar panel, **right-click** `Tomcat 11` and select **Stop Server** (or click the red square stop icon in the panel toolbar).
 
 ---
 
