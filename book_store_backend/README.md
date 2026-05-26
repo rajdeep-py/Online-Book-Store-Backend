@@ -163,7 +163,7 @@ Files are stored securely in physical directories under context:
 * `GET /api/admins/{id}` - View specific administrator
 * `POST /api/admins` - Create admin user
 * `PUT /api/admins/{id}` - Edit admin details
-* `DELETE /api/admins/{id}` - Revoke admin user
+* `DELETE /api/admins/{id}` - Revoke admin users
 
 ### ⚙️ Business Charges Config (`/api/charges/*`)
 * `GET /api/charges` - View list of configurations
