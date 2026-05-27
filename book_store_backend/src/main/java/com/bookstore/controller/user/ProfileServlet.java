@@ -64,8 +64,40 @@ public class ProfileServlet extends HttpServlet {
         String password = payload.containsKey("password") && !payload.isNull("password") ? payload.getString("password") : null;
         String phoneNumber = payload.containsKey("phone_number") && !payload.isNull("phone_number") ? payload.getString("phone_number") : null;
         String address = payload.containsKey("address") && !payload.isNull("address") ? payload.getString("address") : null;
+        String profilePhotoRaw = payload.containsKey("profile_photo") && !payload.isNull("profile_photo") ? payload.getString("profile_photo") : null;
+        
+        String profilePhotoPath = null;
+        if (profilePhotoRaw != null && profilePhotoRaw.startsWith("data:image/")) {
+            try {
+                String[] parts = profilePhotoRaw.split(",");
+                if (parts.length == 2) {
+                    byte[] imageBytes = java.util.Base64.getDecoder().decode(parts[1]);
+                    
+                    // Create directory if not exists
+                    String uploadDir = System.getProperty("user.home") + java.io.File.separator + "bookstore_uploads" + java.io.File.separator + "profile";
+                    java.io.File dir = new java.io.File(uploadDir);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    
+                    String fileName = "customer_" + customerId + ".png";
+                    java.io.File file = new java.io.File(dir, fileName);
+                    
+                    try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
+                        fos.write(imageBytes);
+                    }
+                    
+                    // Set path to be saved in DB
+                    profilePhotoPath = "/book_store_backend/uploads/profile/" + fileName;
+                }
+            } catch (Exception e) {
+                // Ignore base64 parse errors, let photo remain null or throw internal error
+                e.printStackTrace();
+            }
+        }
+
         try {
-            boolean success = authService.updateCustomerProfile(customerId, fullName, email, password, phoneNumber, address);
+            boolean success = authService.updateCustomerProfile(customerId, fullName, email, password, phoneNumber, address, profilePhotoPath);
             if (!success) {
                 JsonUtil.writeJson(response, HttpServletResponse.SC_BAD_REQUEST,
                     Json.createObjectBuilder().add("error", "Update failed. Email may already exist or password is weak.").build());

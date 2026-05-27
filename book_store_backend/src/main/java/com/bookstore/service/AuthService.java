@@ -62,7 +62,7 @@ public class AuthService {
         return userDAO.findById(customerId);
     }
 
-    public boolean updateCustomerProfile(int customerId, String fullName, String email, String password, String phoneNumber, String address)
+    public boolean updateCustomerProfile(int customerId, String fullName, String email, String password, String phoneNumber, String address, String profilePhoto)
             throws SQLException {
         User user = userDAO.findById(customerId);
         if (user == null) {
@@ -92,6 +92,9 @@ public class AuthService {
         }
         if (address != null) {
             user.setAddress(address.trim());
+        }
+        if (profilePhoto != null && !profilePhoto.isBlank()) {
+            user.setProfilePhoto(profilePhoto.trim());
         }
         userDAO.update(user);
         return true;
