@@ -43,6 +43,7 @@ public class LoginServlet extends HttpServlet {
                     .add("customer_id", user.getCustomerId())
                     .add("full_name", user.getFullName())
                     .add("email", user.getEmail())
+                    .add("session_id", session.getId())
                     .build());
         } catch (SQLException ex) {
             JsonUtil.writeJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
