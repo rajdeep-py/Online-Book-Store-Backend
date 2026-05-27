@@ -27,8 +27,8 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         JsonObject payload = JsonUtil.readJsonObject(request);
-        String email = payload.getString("email", null);
-        String password = payload.getString("password", null);
+        String email = payload.containsKey("email") && !payload.isNull("email") ? payload.getString("email") : "";
+        String password = payload.containsKey("password") && !payload.isNull("password") ? payload.getString("password") : "";
         try {
             var user = authService.loginCustomer(email, password);
             if (user == null) {

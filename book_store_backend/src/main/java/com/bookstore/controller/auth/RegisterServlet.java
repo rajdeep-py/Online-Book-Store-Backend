@@ -25,11 +25,11 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         JsonObject payload = JsonUtil.readJsonObject(request);
-        String fullName = payload.getString("full_name", null);
-        String email = payload.getString("email", null);
-        String password = payload.getString("password", null);
-        String phoneNumber = payload.getString("phone_number", null);
-        String address = payload.getString("address", null);
+        String fullName = payload.containsKey("full_name") && !payload.isNull("full_name") ? payload.getString("full_name") : "";
+        String email = payload.containsKey("email") && !payload.isNull("email") ? payload.getString("email") : "";
+        String password = payload.containsKey("password") && !payload.isNull("password") ? payload.getString("password") : "";
+        String phoneNumber = payload.containsKey("phone_number") && !payload.isNull("phone_number") ? payload.getString("phone_number") : "";
+        String address = payload.containsKey("address") && !payload.isNull("address") ? payload.getString("address") : "";
         try {
             int customerId = authService.registerCustomer(fullName, email, password, phoneNumber, address);
             if (customerId <= 0) {

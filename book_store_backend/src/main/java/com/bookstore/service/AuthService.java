@@ -61,4 +61,39 @@ public class AuthService {
     public User getCustomerProfile(int customerId) throws SQLException {
         return userDAO.findById(customerId);
     }
+
+    public boolean updateCustomerProfile(int customerId, String fullName, String email, String password, String phoneNumber, String address)
+            throws SQLException {
+        User user = userDAO.findById(customerId);
+        if (user == null) {
+            return false;
+        }
+        if (fullName != null && !fullName.isBlank()) {
+            user.setFullName(fullName.trim());
+        }
+        if (email != null && !email.isBlank()) {
+            if (!ValidationUtil.isEmailValid(email)) {
+                return false;
+            }
+            User existing = userDAO.findByEmail(email.trim());
+            if (existing != null && existing.getCustomerId() != customerId) {
+                return false;
+            }
+            user.setEmail(email.trim());
+        }
+        if (password != null && !password.isBlank()) {
+            if (!ValidationUtil.isPasswordStrong(password)) {
+                return false;
+            }
+            user.setPassword(PasswordUtil.hashPassword(password));
+        }
+        if (phoneNumber != null) {
+            user.setPhoneNumber(phoneNumber.trim());
+        }
+        if (address != null) {
+            user.setAddress(address.trim());
+        }
+        userDAO.update(user);
+        return true;
+    }
 }

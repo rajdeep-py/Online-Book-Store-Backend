@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class FileStorageUtil {
+    private static final String UPLOADS_BASE_DIR = System.getProperty("user.home") + File.separator + "bookstore_uploads";
+
     private FileStorageUtil() {
     }
 
@@ -17,7 +19,7 @@ public final class FileStorageUtil {
         String safeName = sanitizeName(bookName);
         String relativeDir = "/uploads/book/" + bookId;
         String relativePath = relativeDir + "/" + safeName + extension;
-        storeFile(context, relativeDir, relativePath, filePart);
+        storeFile(relativeDir, relativePath, filePart);
         return relativePath;
     }
 
@@ -27,18 +29,26 @@ public final class FileStorageUtil {
         String safeName = sanitizeName(fullName);
         String relativeDir = "/uploads/customers/" + customerId;
         String relativePath = relativeDir + "/" + safeName + extension;
-        storeFile(context, relativeDir, relativePath, filePart);
+        storeFile(relativeDir, relativePath, filePart);
         return relativePath;
     }
 
-    private static void storeFile(ServletContext context, String relativeDir, String relativePath, Part filePart)
+    private static void storeFile(String relativeDir, String relativePath, Part filePart)
             throws IOException {
-        String absoluteDir = context.getRealPath(relativeDir);
-        if (absoluteDir == null) {
-            throw new IOException("Uploads directory is not available on disk");
+        String internalDir = relativeDir;
+        if (internalDir.startsWith("/uploads")) {
+            internalDir = internalDir.substring("/uploads".length());
         }
-        Files.createDirectories(Path.of(absoluteDir));
-        File output = new File(context.getRealPath(relativePath));
+        String internalPath = relativePath;
+        if (internalPath.startsWith("/uploads")) {
+            internalPath = internalPath.substring("/uploads".length());
+        }
+
+        File dir = new File(UPLOADS_BASE_DIR, internalDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File output = new File(UPLOADS_BASE_DIR, internalPath);
         filePart.write(output.getAbsolutePath());
     }
 

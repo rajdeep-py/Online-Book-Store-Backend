@@ -47,6 +47,14 @@
     <servlet-name>ContactMessageServlet</servlet-name>
     <servlet-class>com.bookstore.controller.user.ContactMessageServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>ProfileServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.user.ProfileServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>UploadsServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.user.UploadsServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>AdminCustomerServlet</servlet-name>
@@ -98,6 +106,14 @@
     <servlet-name>ContactMessageServlet</servlet-name>
     <url-pattern>/api/contacts/*</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ProfileServlet</servlet-name>
+    <url-pattern>/api/profile/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UploadsServlet</servlet-name>
+    <url-pattern>/uploads/*</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>AdminCustomerServlet</servlet-name>
@@ -140,6 +156,10 @@
   <filter-mapping>
     <filter-name>AuthFilter</filter-name>
     <url-pattern>/api/orders/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AuthFilter</filter-name>
+    <url-pattern>/api/profile/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>AdminFilter</filter-name>

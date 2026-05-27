@@ -2,7 +2,6 @@ package com.bookstore.dao;
 
 import com.bookstore.model.Order;
 import com.bookstore.util.DBConnection;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
