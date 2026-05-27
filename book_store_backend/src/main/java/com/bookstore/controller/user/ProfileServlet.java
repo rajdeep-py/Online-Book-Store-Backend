@@ -88,7 +88,7 @@ public class ProfileServlet extends HttpServlet {
                     }
                     
                     // Set path to be saved in DB
-                    profilePhotoPath = "/book_store_backend/uploads/profile/" + fileName;
+                    profilePhotoPath = "/uploads/profile/" + fileName;
                 }
             } catch (Exception e) {
                 // Ignore base64 parse errors, let photo remain null or throw internal error
