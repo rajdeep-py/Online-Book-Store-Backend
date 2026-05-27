@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 
 public class Book {
     private int bookId;
-    private String bookPhoto;
+    private byte[] bookPhoto;
     private String bookName;
     private String bookCategory;
     private String bookDescription;
@@ -27,11 +27,11 @@ public class Book {
         this.bookId = bookId;
     }
 
-    public String getBookPhoto() {
+    public byte[] getBookPhoto() {
         return bookPhoto;
     }
 
-    public void setBookPhoto(String bookPhoto) {
+    public void setBookPhoto(byte[] bookPhoto) {
         this.bookPhoto = bookPhoto;
     }
 

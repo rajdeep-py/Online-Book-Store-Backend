@@ -26,6 +26,24 @@ public class BookServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.endsWith("/image")) {
+            String idStr = pathInfo.split("/")[1];
+            try {
+                Book book = bookService.getBookById(Integer.parseInt(idStr));
+                if (book == null || book.getBookPhoto() == null || book.getBookPhoto().length < 100) {
+                    response.sendRedirect("https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=300&q=80");
+                    return;
+                }
+                response.setContentType("image/jpeg");
+                response.setContentLength(book.getBookPhoto().length);
+                response.getOutputStream().write(book.getBookPhoto());
+            } catch (SQLException e) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+            return;
+        }
+
         String idParam = getIdParam(request);
         String search = request.getParameter("q");
         try {
@@ -63,10 +81,7 @@ public class BookServlet extends HttpServlet {
                 int bookId = bookService.addBook(book);
                 Part photo = request.getPart("book_photo");
                 if (photo != null && photo.getSize() > 0) {
-                    String path = FileStorageUtil.storeBookPhoto(request.getServletContext(),
-                        bookId, book.getBookName(), photo);
-                    book.setBookId(bookId);
-                    book.setBookPhoto(path);
+                    book.setBookPhoto(photo.getInputStream().readAllBytes());
                     bookService.updateBook(book);
                 }
                 JsonUtil.writeJson(response, HttpServletResponse.SC_CREATED,
@@ -91,9 +106,7 @@ public class BookServlet extends HttpServlet {
                 Book book = parseBookFromMultipart(request, true);
                 Part photo = request.getPart("book_photo");
                 if (photo != null && photo.getSize() > 0) {
-                    String path = FileStorageUtil.storeBookPhoto(request.getServletContext(),
-                        book.getBookId(), book.getBookName(), photo);
-                    book.setBookPhoto(path);
+                    book.setBookPhoto(photo.getInputStream().readAllBytes());
                 }
                 bookService.updateBook(book);
                 JsonUtil.writeJson(response, HttpServletResponse.SC_OK,
@@ -145,7 +158,7 @@ public class BookServlet extends HttpServlet {
         book.setDiscountPercent(payload.containsKey("discount_percent")
             ? payload.getJsonNumber("discount_percent").bigDecimalValue() : BigDecimal.ZERO);
         book.setStockAmount(payload.containsKey("stock_amount") ? payload.getInt("stock_amount") : 0);
-        book.setBookPhoto(payload.getString("book_photo", null));
+
         return book;
     }
 
@@ -169,7 +182,10 @@ public class BookServlet extends HttpServlet {
     private String getIdParam(HttpServletRequest request) {
         String path = request.getPathInfo();
         if (path != null && path.length() > 1) {
-            return path.substring(1);
+            String[] parts = path.split("/");
+            if (parts.length > 1) {
+                return parts[1];
+            }
         }
         return request.getParameter("id");
     }
@@ -177,7 +193,7 @@ public class BookServlet extends HttpServlet {
     private JsonObject toJson(Book book) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("book_id", book.getBookId());
-        builder.add("book_photo", book.getBookPhoto() == null ? "" : book.getBookPhoto());
+        builder.add("book_photo", book.getBookPhoto() == null ? "" : ("/api/books/" + book.getBookId() + "/image"));
         builder.add("book_name", book.getBookName());
         builder.add("book_category", book.getBookCategory());
         builder.add("book_description", book.getBookDescription() == null ? "" : book.getBookDescription());

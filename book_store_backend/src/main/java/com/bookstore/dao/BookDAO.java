@@ -65,7 +65,7 @@ public class BookDAO {
     public int addBook(Book book) throws SQLException {
         Connection conn = DBConnection.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(queries.getString("book.insert"), Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, book.getBookPhoto());
+            ps.setBytes(1, book.getBookPhoto());
             ps.setString(2, book.getBookName());
             ps.setString(3, book.getBookCategory());
             ps.setString(4, book.getBookDescription());
@@ -91,7 +91,7 @@ public class BookDAO {
     public void updateBook(Book book) throws SQLException {
         Connection conn = DBConnection.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(queries.getString("book.update"))) {
-            ps.setString(1, book.getBookPhoto());
+            ps.setBytes(1, book.getBookPhoto());
             ps.setString(2, book.getBookName());
             ps.setString(3, book.getBookCategory());
             ps.setString(4, book.getBookDescription());
@@ -134,7 +134,7 @@ public class BookDAO {
     private Book mapBook(ResultSet rs) throws SQLException {
         Book book = new Book();
         book.setBookId(rs.getInt("book_id"));
-        book.setBookPhoto(rs.getString("book_photo"));
+        book.setBookPhoto(rs.getBytes("book_photo"));
         book.setBookName(rs.getString("book_name"));
         book.setBookCategory(rs.getString("book_category"));
         book.setBookDescription(rs.getString("book_description"));

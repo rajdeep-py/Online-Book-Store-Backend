@@ -83,12 +83,20 @@ public class CartServlet extends HttpServlet {
         cart.setCustomerId(sessionCustomerId != null ? sessionCustomerId : payload.getInt("customer_id"));
         cart.setItemsJson(payload.getJsonArray("items").toString());
         try {
-            int cartId = cartService.create(cart);
-            JsonUtil.writeJson(response, HttpServletResponse.SC_CREATED,
-                Json.createObjectBuilder().add("cart_id", cartId).build());
+            Cart existingCart = cartService.getByCustomer(cart.getCustomerId());
+            if (existingCart != null) {
+                cart.setCartId(existingCart.getCartId());
+                cartService.update(cart);
+                JsonUtil.writeJson(response, HttpServletResponse.SC_OK,
+                    Json.createObjectBuilder().add("cart_id", cart.getCartId()).build());
+            } else {
+                int cartId = cartService.create(cart);
+                JsonUtil.writeJson(response, HttpServletResponse.SC_CREATED,
+                    Json.createObjectBuilder().add("cart_id", cartId).build());
+            }
         } catch (SQLException ex) {
             JsonUtil.writeJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                Json.createObjectBuilder().add("error", "Create failed").build());
+                Json.createObjectBuilder().add("error", "Create or Update failed").build());
         }
     }
 

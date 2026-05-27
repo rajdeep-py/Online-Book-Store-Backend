@@ -22,7 +22,7 @@ public class UploadsServlet extends HttpServlet {
 
         File file = new File(UPLOADS_BASE_DIR, pathInfo);
         if (!file.exists() || file.isDirectory()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.sendRedirect("https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=300&q=80");
             return;
         }
 

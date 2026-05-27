@@ -182,6 +182,7 @@ public class OrderServlet extends HttpServlet {
         builder.add("platform_fee", order.getPlatformFee());
         builder.add("delivery_fee", order.getDeliveryFee());
         builder.add("order_status", order.getOrderStatus());
+        builder.add("created_at", order.getCreatedAt() != null ? order.getCreatedAt().toString() : "");
         return builder.build();
     }
 
