@@ -352,9 +352,86 @@ curl -i -X POST http://localhost:8080/book_store_backend/auth/login \
   -d '{"email": "james.smith@example.com", "password": "SecurePassword123!"}'
 ```
 
-**Place an Order (Calculates platforms charges, tax fees, totals, and updates book stock in real-time):**
+### 4. Cart Operations
+
+**Retrieve Customer Cart (Session-based or by query parameter):**
+```bash
+curl -i -X GET "http://localhost:8080/book_store_backend/api/carts?customer_id=1"
+```
+
+**Create / Sync Cart Items:**
+```bash
+curl -i -X POST http://localhost:8080/book_store_backend/api/carts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": 1,
+    "items": [
+      {"book_id": 1, "quantity": 1},
+      {"book_id": 4, "quantity": 2}
+    ]
+  }'
+```
+
+**Update Cart (Requires Cart ID):**
+```bash
+curl -i -X PUT http://localhost:8080/book_store_backend/api/carts/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": 1,
+    "items": [
+      {"book_id": 1, "quantity": 3}
+    ]
+  }'
+```
+
+**Clear / Delete Cart:**
+```bash
+curl -i -X DELETE http://localhost:8080/book_store_backend/api/carts/1
+```
+
+### 5. Order Processing
+
+**Place a New Order (Calculates platform charges, tax fees, totals, and updates book stock in real-time. Requires Customer login session):**
 ```bash
 curl -i -X POST http://localhost:8080/book_store_backend/api/orders \
   -H "Content-Type: application/json" \
-  -d '{"customer_id": 1, "items": [{"book_id": 1, "quantity": 2}, {"book_id": 2, "quantity": 1}]}'
+  -H "Cookie: JSESSIONID=YourSessionIdHere" \
+  -d '{
+    "items": [
+      {"book_id": 1, "quantity": 2},
+      {"book_id": 2, "quantity": 1}
+    ]
+  }'
+```
+
+**Retrieve Orders (All for Admin, or Customer's own based on session):**
+```bash
+curl -i -X GET "http://localhost:8080/book_store_backend/api/orders?customer_id=1"
+```
+
+**Retrieve a Specific Order (by ID):**
+```bash
+curl -i -X GET http://localhost:8080/book_store_backend/api/orders/1
+```
+
+**Update Order Status / Admin Overrides (Requires Admin login session):**
+```bash
+curl -i -X PUT http://localhost:8080/book_store_backend/api/orders/1 \
+  -H "Content-Type: application/json" \
+  -H "Cookie: JSESSIONID=AdminSessionIdHere" \
+  -d '{
+    "customer_id": 1,
+    "total_bill_amount": 45.99,
+    "tax_charges": 2.50,
+    "platform_fee": 1.00,
+    "delivery_fee": 5.00,
+    "order_status": "Shipped",
+    "items": [{"book_id": 1, "quantity": 2}]
+  }'
+```
+
+**Delete an Order (Requires Admin login session):**
+```bash
+curl -i -X DELETE http://localhost:8080/book_store_backend/api/orders/1 \
+  -H "Cookie: JSESSIONID=AdminSessionIdHere"
 ```

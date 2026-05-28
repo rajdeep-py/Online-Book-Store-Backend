@@ -31,9 +31,19 @@ public class BookServlet extends HttpServlet {
             String idStr = pathInfo.split("/")[1];
             try {
                 Book book = bookService.getBookById(Integer.parseInt(idStr));
-                if (book == null || book.getBookPhoto() == null || book.getBookPhoto().length < 100) {
+                if (book == null || book.getBookPhoto() == null) {
                     response.sendRedirect("https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=300&q=80");
                     return;
+                }
+                if (book.getBookPhoto().length < 100) {
+                    String photoPath = new String(book.getBookPhoto());
+                    if (photoPath.startsWith("/uploads/")) {
+                        response.sendRedirect(request.getContextPath() + photoPath);
+                        return;
+                    } else {
+                        response.sendRedirect("https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=300&q=80");
+                        return;
+                    }
                 }
                 response.setContentType("image/jpeg");
                 response.setContentLength(book.getBookPhoto().length);
