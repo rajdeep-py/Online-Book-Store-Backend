@@ -174,11 +174,11 @@ public class AdminCustomerServlet extends HttpServlet {
     private JsonObject toJson(User user) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("customer_id", user.getCustomerId());
-        builder.add("full_name", user.getFullName());
-        builder.add("email", user.getEmail());
-        builder.add("phone_number", user.getPhoneNumber() == null ? "" : user.getPhoneNumber());
-        builder.add("profile_photo", user.getProfilePhoto() == null ? "" : user.getProfilePhoto());
-        builder.add("address", user.getAddress() == null ? "" : user.getAddress());
+        builder.add("full_name", user.getFullName() != null ? user.getFullName() : "");
+        builder.add("email", user.getEmail() != null ? user.getEmail() : "");
+        builder.add("phone_number", user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
+        builder.add("profile_photo", user.getProfilePhoto() != null ? user.getProfilePhoto() : "");
+        builder.add("address", user.getAddress() != null ? user.getAddress() : "");
         return builder.build();
     }
 }

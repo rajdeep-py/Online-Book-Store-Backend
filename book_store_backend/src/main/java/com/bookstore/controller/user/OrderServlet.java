@@ -177,11 +177,11 @@ public class OrderServlet extends HttpServlet {
         builder.add("order_id", order.getOrderId());
         builder.add("customer_id", order.getCustomerId());
         builder.add("items_ordered", parseItems(order.getItemsOrderedJson()));
-        builder.add("total_bill_amount", order.getTotalBillAmount());
-        builder.add("tax_charges", order.getTaxCharges());
-        builder.add("platform_fee", order.getPlatformFee());
-        builder.add("delivery_fee", order.getDeliveryFee());
-        builder.add("order_status", order.getOrderStatus());
+        builder.add("total_bill_amount", order.getTotalBillAmount() != null ? order.getTotalBillAmount() : java.math.BigDecimal.ZERO);
+        builder.add("tax_charges", order.getTaxCharges() != null ? order.getTaxCharges() : java.math.BigDecimal.ZERO);
+        builder.add("platform_fee", order.getPlatformFee() != null ? order.getPlatformFee() : java.math.BigDecimal.ZERO);
+        builder.add("delivery_fee", order.getDeliveryFee() != null ? order.getDeliveryFee() : java.math.BigDecimal.ZERO);
+        builder.add("order_status", order.getOrderStatus() != null ? order.getOrderStatus() : "");
         builder.add("created_at", order.getCreatedAt() != null ? order.getCreatedAt().toString() : "");
         return builder.build();
     }

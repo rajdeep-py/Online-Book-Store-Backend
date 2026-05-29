@@ -43,6 +43,7 @@ public class AdminLoginServlet extends HttpServlet {
                     .add("admin_id", admin.getAdminId())
                     .add("admin_name", admin.getAdminName())
                     .add("admin_email", admin.getAdminEmail())
+                    .add("session_id", session.getId())
                     .build());
         } catch (SQLException ex) {
             JsonUtil.writeJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

@@ -61,6 +61,10 @@
     <servlet-class>com.bookstore.controller.admin.AdminCustomerServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>AdminOrderServlet</servlet-name>
+    <servlet-class>com.bookstore.controller.admin.AdminOrderServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>AdminUserServlet</servlet-name>
     <servlet-class>com.bookstore.controller.admin.AdminUserServlet</servlet-class>
   </servlet>
@@ -117,7 +121,23 @@
 
   <servlet-mapping>
     <servlet-name>AdminCustomerServlet</servlet-name>
-    <url-pattern>/api/customers/*</url-pattern>
+    <url-pattern>/api/admin/customers</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminCustomerServlet</servlet-name>
+    <url-pattern>/api/admin/customers/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminOrderServlet</servlet-name>
+    <url-pattern>/api/admin/orders</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminOrderServlet</servlet-name>
+    <url-pattern>/api/admin/orders/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminUserServlet</servlet-name>
+    <url-pattern>/api/admins</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>AdminUserServlet</servlet-name>
@@ -125,7 +145,15 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>BusinessChargesServlet</servlet-name>
+    <url-pattern>/api/charges</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>BusinessChargesServlet</servlet-name>
     <url-pattern>/api/charges/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AboutUsServlet</servlet-name>
+    <url-pattern>/api/about</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>AboutUsServlet</servlet-name>
@@ -163,11 +191,31 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/admins</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
     <url-pattern>/api/admins/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>AdminFilter</filter-name>
-    <url-pattern>/api/customers/*</url-pattern>
+    <url-pattern>/api/admin/customers</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/admin/customers/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/admin/orders</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/admin/orders/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AdminFilter</filter-name>
+    <url-pattern>/api/charges</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>AdminFilter</filter-name>
