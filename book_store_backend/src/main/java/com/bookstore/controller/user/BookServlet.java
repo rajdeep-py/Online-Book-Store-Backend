@@ -91,6 +91,7 @@ public class BookServlet extends HttpServlet {
                 int bookId = bookService.addBook(book);
                 Part photo = request.getPart("book_photo");
                 if (photo != null && photo.getSize() > 0) {
+                    book.setBookId(bookId);
                     book.setBookPhoto(photo.getInputStream().readAllBytes());
                     bookService.updateBook(book);
                 }
@@ -117,6 +118,11 @@ public class BookServlet extends HttpServlet {
                 Part photo = request.getPart("book_photo");
                 if (photo != null && photo.getSize() > 0) {
                     book.setBookPhoto(photo.getInputStream().readAllBytes());
+                } else {
+                    Book existingBook = bookService.getBookById(book.getBookId());
+                    if (existingBook != null) {
+                        book.setBookPhoto(existingBook.getBookPhoto());
+                    }
                 }
                 bookService.updateBook(book);
                 JsonUtil.writeJson(response, HttpServletResponse.SC_OK,
@@ -124,6 +130,10 @@ public class BookServlet extends HttpServlet {
                 return;
             }
             Book book = parseBook(request, true);
+            Book existingBook = bookService.getBookById(book.getBookId());
+            if (existingBook != null) {
+                book.setBookPhoto(existingBook.getBookPhoto());
+            }
             bookService.updateBook(book);
             JsonUtil.writeJson(response, HttpServletResponse.SC_OK,
                 Json.createObjectBuilder().add("message", "Updated").build());
