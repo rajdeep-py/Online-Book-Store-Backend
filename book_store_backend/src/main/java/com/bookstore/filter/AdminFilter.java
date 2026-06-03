@@ -24,6 +24,15 @@ public class AdminFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        boolean isPublicAdminSignup = "POST".equalsIgnoreCase(httpRequest.getMethod())
+                && "/api/admins".equals(httpRequest.getServletPath());
+
+        if (isPublicAdminSignup) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         HttpSession session = httpRequest.getSession(false);
         if (session == null || !SessionUtil.isAdminLoggedIn(session)) {
             JsonUtil.writeJson(httpResponse, HttpServletResponse.SC_UNAUTHORIZED,
