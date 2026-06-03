@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS admin_users (
 
 CREATE TABLE IF NOT EXISTS book_inventory (
   book_id INT AUTO_INCREMENT PRIMARY KEY,
-  book_photo VARCHAR(255),
+  book_photo LONGBLOB,
   book_name VARCHAR(200) NOT NULL,
   book_category VARCHAR(100) NOT NULL,
   book_description TEXT,
@@ -101,3 +101,5 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+ALTER TABLE book_inventory MODIFY COLUMN book_photo LONGBLOB;

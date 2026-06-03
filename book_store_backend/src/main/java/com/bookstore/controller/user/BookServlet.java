@@ -87,6 +87,7 @@ public class BookServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             if (request.getContentType() != null && request.getContentType().startsWith("multipart/")) {
+                request.getParts(); // Force Tomcat to parse the multipart body
                 Book book = parseBookFromMultipart(request, false);
                 int bookId = bookService.addBook(book);
                 Part photo = request.getPart("book_photo");
@@ -114,6 +115,7 @@ public class BookServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             if (request.getContentType() != null && request.getContentType().startsWith("multipart/")) {
+                request.getParts(); // Force Tomcat to parse the multipart body
                 Book book = parseBookFromMultipart(request, true);
                 Part photo = request.getPart("book_photo");
                 if (photo != null && photo.getSize() > 0) {
