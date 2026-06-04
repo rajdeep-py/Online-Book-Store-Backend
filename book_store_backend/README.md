@@ -243,35 +243,25 @@ startup.bat
 
 There are two primary methods to run and deploy the Bookstore project inside Visual Studio Code:
 
-### 💻 Method A: The Simplest Terminal Way (Highly Recommended)
-This is the easiest and most direct method. It uses VS Code's integrated terminal to package and hot-deploy your application directly to your active local Tomcat instance.
+### 💻 Method A: The Simplest Terminal Way (Embedded Tomcat - Highly Recommended)
+This is the easiest and most direct method. It uses the embedded Tomcat server so you do not need to install or copy any WAR files to an external server manually!
 
 1. **Open the Project Folder**:
    - Launch VS Code.
-   - Click **File ➡️ Open Folder...** and select `/Users/rajdeepdey/Project/Online Book Store/backend/book_store_backend` (or your local project root).
+   - Click **File ➡️ Open Folder...** and select your local project root (`Online-Book-Store-Backend/book_store_backend`).
 2. **Open the Integrated Terminal**:
    - Open a terminal inside VS Code by pressing ``Ctrl + ` `` or clicking **Terminal ➡️ New Terminal** in the top menu bar.
-3. **Build the Project WAR file**:
-   - Type this command inside the terminal and press **Enter** to compile and package your Java servlet code:
-     ```bash
-     mvn clean package
+3. **Build and Run the Embedded Server**:
+   - Type this exact command inside the terminal and press **Enter**:
+     ```powershell
+     mvn clean compile exec:java '-Dexec.mainClass=com.bookstore.Runner'
      ```
-4. **Deploy the WAR file to Tomcat**:
-   * **macOS**:
-     ```bash
-     cp target/book_store_backend.war /opt/homebrew/Cellar/tomcat/11.0.22/libexec/webapps/
-     ```
-   * **Windows**:
-     ```cmd
-     copy target\book_store_backend.war C:\tomcat11\webapps\
-     ```
-5. **Verify and Play**:
-   Tomcat automatically extracts and starts the backend service. Open your browser and navigate to:  
+     *(Note: The single quotes around `-D...` are important if you are using PowerShell on Windows!)*
+4. **Verify and Play**:
+   Tomcat automatically extracts, starts, and listens on port 8080. Wait until you see `INFO: Starting ProtocolHandler ["http-nio-8080"]` in your console. Then open your browser and navigate to:  
    🔗 **[http://localhost:8080/book_store_backend/api/books](http://localhost:8080/book_store_backend/api/books)**
-6. 🛑 **Stop Server**:
-   To shut down the background Tomcat server running on your machine:
-   * **macOS**: `brew services stop tomcat`
-   * **Windows**: Run `shutdown.bat` inside the Tomcat bin folder, or close the terminal window.
+5. 🛑 **Stop Server**:
+   To shut down the backend server, simply click inside the terminal window and press `Ctrl + C`.
 
 ---
 
